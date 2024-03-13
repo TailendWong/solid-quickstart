@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>问答页面</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>问答页面</h1>
+    <label for="knowledgeBase">选择知识库：</label>
+    <select id="knowledgeBase">
+        <!-- 下拉框选项将通过JavaScript动态生成 -->
+    </select>
+    <br><br>
+    <label for="question">输入问题：</label>
+    <input type="text" id="question">  
+    <button id="getAnswer">获取答案</button>
+    <br><br>
+    <span style="font-size: 13px;color: red;">响应大约需要1分钟</span>
+    <br><br>
+    <div id="answer"></div>
+
+    <script>
+        var token = "b'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IjA1MjdkMzZjMDNhMDQ3MzM5MDJmYjExZjA5MjY3MWI2NTI5MCIsImV4cCI6MTcwNzI5MzYxM30.UiCib8x85nI0LIfc6bS3iOtSbbn6QcVhYF5XwpMCLVg'"; // 替换成实际的token
+        // 获取token
+        function getToken() {
+            $.ajax({
+                url: 'http://222.128.47.160:8094/algorithm/xianniu/get_secret',
+                type: 'POST',
+                data: JSON.stringify({"appId": "0527d36c03a04733902fb11f092671b65290"}),
+                contentType: 'application/json',
+                success: function(response) {
+                    token = response.info.secret;
+                    getKnowledgeBaseOptions();
+                }
+            });
+        }
+        // 获取下拉框选项
+        function getKnowledgeBaseOptions() {
+            $.ajax({
+                url: 'http://222.128.47.160:8094/algorithm/xianniu/get_knowledge_base',
+                method: 'GET',
+                headers: {token},
+                data: JSON.stringify({ }),
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.code === 200) {
+                        const options = response.info;
+                        const knowledgeBaseSelect = document.getElementById('knowledgeBase');
+                        for (const key in options) {
+                            const option = document.createElement('option');
+                            option.value = key;
+                            option.textContent = options[key];
+                            knowledgeBaseSelect.appendChild(option);
+                        }
+                    } else {
+                        alert('获取知识库选项失败');
+                    }
+                },
+                error: function () {
+                    alert('请求失败，请检查网络连接');
+                }
+            });
+        }
+
+        function loading(v) {
+            $('#getAnswer').prop('disabled', v)
+            $('#getAnswer').text(v ? '获取中...' : '获取答案')
+        }
+
+        // 获取问答结果
+        function getAnswer() {
+            const questionInput = document.getElementById('question');
+            const knowledgeBaseSelect = document.getElementById('knowledgeBase');
+            const answerDiv = document.getElementById('answer');
+
+            if (!questionInput.value) {
+                alert('请输入问题');
+                return;
+            }
+            loading(true)
+            $.ajax({
+                url: 'http://222.128.47.160:8094/algorithm/xianniu/get_knowledge_base',
+                method: 'POST',
+                headers: {token},
+                data: JSON.stringify({ problem: questionInput.value, collection_name: knowledgeBaseSelect.value }),
+                contentType: 'application/json',
+                success: function (response) {
+                    loading(false)
+                    if (response.code === 200) {
+                        answerDiv.innerHTML = response.info;
+                    } else {
+                        alert('获取答案失败');
+                    }
+                },
+                error: function () {
+                    loading(false)
+                    alert('请求失败，请检查网络连接');
+                }
+            });
+        }
+
+        // 初始化页面
+        function init() {
+            getToken();
+            document.getElementById('getAnswer').addEventListener('click', getAnswer);
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
