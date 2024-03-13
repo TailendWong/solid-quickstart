@@ -1,9 +1,16 @@
 import { Title } from "solid-start";
+import { createSignal, onMount } from 'solid-js';
 import Counter from "~/components/Counter";
 
 export default function Home() {
-  window.location.href = '/qatest.html';
-  return null;
+  const [navigate, setNavigate] = createSignal();
+ 
+  onMount(() => {
+    setNavigate(() => {
+      window.location.href = '/qatest.html';
+    });
+  });
+  
   return (
     <main>
       <Title>Hello World</Title>
