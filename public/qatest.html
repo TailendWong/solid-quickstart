@@ -26,7 +26,7 @@
         // 获取token
         function getToken() {
             $.ajax({
-                url: 'http://222.128.47.160:8094/algorithm/xianniu/get_secret',
+                url: 'https://222.128.47.160:8094/algorithm/xianniu/get_secret',
                 type: 'POST',
                 data: JSON.stringify({"appId": "0527d36c03a04733902fb11f092671b65290"}),
                 contentType: 'application/json',
@@ -39,7 +39,7 @@
         // 获取下拉框选项
         function getKnowledgeBaseOptions() {
             $.ajax({
-                url: 'http://222.128.47.160:8094/algorithm/xianniu/get_knowledge_base',
+                url: 'https://222.128.47.160:8094/algorithm/xianniu/get_knowledge_base',
                 method: 'GET',
                 headers: {token},
                 data: JSON.stringify({ }),
@@ -81,7 +81,7 @@
             }
             loading(true)
             $.ajax({
-                url: 'http://222.128.47.160:8094/algorithm/xianniu/get_knowledge_base',
+                url: 'https://222.128.47.160:8094/algorithm/xianniu/get_knowledge_base',
                 method: 'POST',
                 headers: {token},
                 data: JSON.stringify({ problem: questionInput.value, collection_name: knowledgeBaseSelect.value }),
